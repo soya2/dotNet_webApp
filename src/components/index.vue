@@ -1,10 +1,21 @@
 <template>
   <div>
-    <p>Index</p>
     <img class="backgrand-img" src="../assets/bg.jpg" />
     <div class="main">
-      <div class="card-top" @mousedown="touchMove"></div>
-      <div class="card-middle"></div>
+      <div class="card-top" @mousedown="touchMove">
+        <div class="album cardinner">专辑封面</div>
+        <div class="text cardinner">
+          <a class="router-link-active" href="#" @click="jump()">进入专辑</a>
+          <img class="right-icon" src="../assets/right.svg">
+        </div>
+      </div>
+      <div class="card-middle">
+        <div class="album">专辑封面</div>
+        <div class="text">
+          <router-link class="router-link-active" to="/detail">进入专辑</router-link>
+          <img class="right-icon" src="../assets/right.svg">
+        </div>
+      </div>
       <div class="card-bottom"></div>
       <div class="card-last"></div>
     </div>
@@ -54,9 +65,9 @@ export default {
       }// 计算鼠标移动时的偏移量并修改cardtop的位置属性，减去鼠标相对card的偏移量是避免card重置到鼠标左上角
       document.onmouseup = () => {
         var distance = this.getDistance(e.clientX, e.clientY, event.clientX, event.clientY)
-        if (distance < 150) {
-          cardObj.style.left = 130 + 'px'
-          cardObj.style.top = 130 + 'px'
+        if (distance < 160) {
+          cardObj.style.left = 150 + 'px'
+          cardObj.style.top = 150 + 'px'
           cardObj.style.transition =  'all .5s'
         } else {
           var angle = this.getAngle(e.clientX, e.clientY, event.clientX, event.clientY)
@@ -78,13 +89,13 @@ export default {
           var cardBottom = document.getElementsByClassName('card-bottom')
           // 底部卡片顶上
           setTimeout(() => {
-            cardTwo[0].style.width = 260 + 'px'
-            cardTwo[0].style.height = 260 + 'px'
+            cardTwo[0].style.width = 300 + 'px'
+            cardTwo[0].style.height = 300 + 'px'
             cardTwo[0].style.transform = 'translate(-50%, -50%)'
             cardTwo[0].style.transition =  'all .5s'
 
-            cardBottom[0].style.width = 250 + 'px'
-            cardBottom[0].style.height = 250 + 'px'
+            cardBottom[0].style.width = 290 + 'px'
+            cardBottom[0].style.height = 290 + 'px'
             cardBottom[0].style.transform = 'translate(-50%, -45%)'
             cardBottom[0].style.transition =  'all .5s'
           },600)
@@ -102,21 +113,39 @@ export default {
             cardBottom[0].style.height = ''
             cardBottom[0].style.transform = ''
             cardBottom[0].style.transition =  ''
-          }, 800)
+          }, 1000)
         }
         document.onmousemove = null
         document.onmouseup = null
       }
+    },
+    jump () {
+      var cardInnerObj = document.getElementsByClassName('cardinner')
+      var cardTopObj = document.getElementsByClassName('card-top')
+      cardInnerObj[0].style.transition = 'all .8s'
+      cardInnerObj[0].style.visibility = 'hidden'
+      cardInnerObj[0].style.opacity = 1
+      setTimeout(() => {
+        cardTopObj[0].style.transition = 'all .8s'
+        cardTopObj[0].style.width = 720 + 'px'
+        cardTopObj[0].style.height = 500 + 'px'
+        cardTopObj[0].style.opacity = 1
+      }, 1000);
+      setTimeout(() => {
+        this.$router.push({
+          path: '/detail'
+        })
+      }, 1800);
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-@main_size: 260px;
-@card_top_size: 260px;
-@card_middle_size: 250px;
-@card_bottom_size: 240px;
+@main_size: 300px;
+@card_top_size: 300px;
+@card_middle_size: 290px;
+@card_bottom_size: 280px;
 
 html::-webkit-scrollbar {
   width: 0 !important;
@@ -141,12 +170,40 @@ html::-webkit-scrollbar {
 }
 
 .card {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 1px 1px 14px rgb(66, 66, 66);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 1px 1px 14px rgb(66, 66, 66);
+  padding: 0 0 10 0;
+  overflow: hidden;
+  .cardinner {
+    pointer-events: none;
+  }
+}
+
+.album {
+  width: @card_top_size;
+  height: @card_top_size - 80px;
+  border-radius: 12px 12px 0 0;
+  background-color: rgb(190, 131, 131);
+  pointer-events: none;
+}
+
+.text {
+  padding-left: 15px;
+  padding-top: 15px;
+  .router-link-active {
+    font-size: 18px;
+    text-decoration: none;
+    color: black;
+  }
+  .right-icon {
+    padding-left: 6px;
+    width: 18px;
+    height: 18px;
+  }
 }
 
 .card-top {
@@ -171,6 +228,7 @@ html::-webkit-scrollbar {
     height: @card_bottom_size;
     transform: translate(-50%, -40%);
 }
+
 .card-last {
     &:extend(.card);
     z-index: -3;
