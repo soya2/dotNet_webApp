@@ -3,16 +3,22 @@
     <img class="backgrand-img" src="../assets/bg.jpg" />
     <div class="main">
       <div class="card-top" @mousedown="touchMove">
-        <div class="album cardinner">专辑封面</div>
-        <div class="text cardinner">
-          <a class="router-link-active" href="#" @click="jump()">进入专辑</a>
+        <div class="album cardinner">
+          <img class="album-img" :src="albumDetailList[roundCountT].pic" />
+          <div class="album-ar">{{ albumDetailList[roundCountT].name }}<br>{{ albumDetailList[roundCountT].ar }}</div>
+        </div>
+        <div class="text cardinner" @click="jump()">
+          点击进入专辑
           <img class="right-icon" src="../assets/right.svg">
         </div>
       </div>
       <div class="card-middle">
-        <div class="album">专辑封面</div>
-        <div class="text">
-          <router-link class="router-link-active" to="/detail">进入专辑</router-link>
+        <div class="album cardinner">
+          <img class="album-img" :src="albumDetailList[roundCountB].pic" />
+          <div class="album-ar">{{ albumDetailList[roundCountB].name }}<br>{{ albumDetailList[roundCountB].ar }}</div>
+        </div>
+        <div class="text cardinner">
+          点击进入专辑
           <img class="right-icon" src="../assets/right.svg">
         </div>
       </div>
@@ -26,10 +32,15 @@
 export default {
   name: 'index',
   data () {
-    // positionX: 0,
-    // positionY: 0
+    return {
+      albumIdList: [91768071, 2502003, 78399571, 80833290],
+      albumDetailList: [],
+      roundCountT: 0,
+      roundCountB: 1
+    }
   },
   created () {
+    this.getAlbumList(this.albumIdList)
     this.stop()
   },
   methods: {
@@ -40,6 +51,17 @@ export default {
       document.body.style.overflow='hidden';
       document.addEventListener("touchmove",mo,false);
     }, // 禁止页面滑动
+    getAlbumList (albumidlist) {
+      for(var i = 0; i < albumidlist.length;){
+        const res = this.$http.get(`?type=album&id=${albumidlist[i]}`)
+        res.then( res => {
+          // console.log(res.data)
+          this.albumDetailList.push({ name: res.data.album.name,  ar: res.data.album.artists[0].name, pic: res.data.album.blurPicUrl })
+        })
+        i++
+      }
+      // console.log('请求：', this.albumDetailList);
+    }, // 根据albumIdList的专辑id获取专辑名作者封面等信息
     getDistance (x1, y1, x2, y2) {
       var xDistance = Math.abs(x1 - x2)
       var yDistance = Math.abs(y1 - y2)
@@ -101,6 +123,18 @@ export default {
           },600)
           // 重置所有卡片
           setTimeout(() => {
+            console.log('飞出去的id为：'+this.roundCountT)
+            if ((this.roundCountB + 1) === this.albumIdList.length) {
+              this.roundCountT = this.roundCountB
+              this.roundCountB = 0
+            } else if ((this.roundCountT + 1) === this.albumIdList.length) {
+              this.roundCountT = this.roundCountB
+              this.roundCountB = 1
+            } else {
+              this.roundCountT += 1
+              this.roundCountB += 1
+            }
+            console.log('顶部的id为' + this.roundCountT)
             cardObj.style.transition = ''
             cardObj.style.left = ''
             cardObj.style.top = ''
@@ -118,13 +152,14 @@ export default {
         document.onmousemove = null
         document.onmouseup = null
       }
+      return {}
     },
     jump () {
       var cardInnerObj = document.getElementsByClassName('cardinner')
       var cardTopObj = document.getElementsByClassName('card-top')
       cardInnerObj[0].style.transition = 'all .8s'
       cardInnerObj[0].style.visibility = 'hidden'
-      cardInnerObj[0].style.opacity = 1
+      cardInnerObj[0].style.opacity = 0
       setTimeout(() => {
         cardTopObj[0].style.transition = 'all .8s'
         cardTopObj[0].style.width = 720 + 'px'
@@ -136,7 +171,10 @@ export default {
           path: '/detail'
         })
       }, 1800);
+      return {}
     }
+  },
+  mounted () {
   }
 }
 </script>
@@ -187,22 +225,35 @@ html::-webkit-scrollbar {
   width: @card_top_size;
   height: @card_top_size - 80px;
   border-radius: 12px 12px 0 0;
-  background-color: rgb(190, 131, 131);
   pointer-events: none;
+  overflow: hidden;
+  // color: #000;
+  .album-img {
+    filter: blur(1px);
+    width: @card_top_size;
+    height: @card_top_size - 80px;
+  }
+  .album-ar {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 0 6px #000000;
+    position: relative;
+    left: 15px;
+    bottom: 60px;
+  }
 }
 
 .text {
-  padding-left: 15px;
-  padding-top: 15px;
-  .router-link-active {
-    font-size: 18px;
-    text-decoration: none;
-    color: black;
-  }
+  height: 80px;
+  text-align: center;
+  font-size: 24px;
+  line-height: 78px;
   .right-icon {
-    padding-left: 6px;
     width: 18px;
     height: 18px;
+    position: relative;
+    top: 2px;
   }
 }
 
