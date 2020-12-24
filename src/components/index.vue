@@ -7,7 +7,7 @@
           <img class="album-img" :src="albumDetailList[roundCountT].pic" />
           <div class="album-ar">{{ albumDetailList[roundCountT].name }}<br>{{ albumDetailList[roundCountT].ar }}</div>
         </div>
-        <div class="text cardinner" @click="jump()">
+        <div class="text cardinner" @click="jump(albumIdList[roundCountT])">
           点击进入专辑
           <img class="right-icon" src="../assets/right.svg">
         </div>
@@ -33,17 +33,24 @@ export default {
   name: 'index',
   data () {
     return {
-      albumIdList: [91768071, 2502003, 78399571, 80833290],
+      albumIdList: [2081552, 31362, 3139519, 266099, 34809286],
       albumDetailList: [],
       roundCountT: 0,
       roundCountB: 1
     }
   },
   created () {
+    this.loadPage()
     this.getAlbumList(this.albumIdList)
     this.stop()
   },
   methods: {
+    loadPage(){
+      if (location.href.indexOf("#reloaded") === -1) {
+        location.href=location.href+"#reloaded"
+        location.reload()
+      }
+    },
     stop () {
       var mo=function (e) {
         e.preventDefault();
@@ -123,7 +130,6 @@ export default {
           },600)
           // 重置所有卡片
           setTimeout(() => {
-            console.log('飞出去的id为：'+this.roundCountT)
             if ((this.roundCountB + 1) === this.albumIdList.length) {
               this.roundCountT = this.roundCountB
               this.roundCountB = 0
@@ -134,7 +140,6 @@ export default {
               this.roundCountT += 1
               this.roundCountB += 1
             }
-            console.log('顶部的id为' + this.roundCountT)
             cardObj.style.transition = ''
             cardObj.style.left = ''
             cardObj.style.top = ''
@@ -154,7 +159,7 @@ export default {
       }
       return {}
     },
-    jump () {
+    jump (id) {
       var cardInnerObj = document.getElementsByClassName('cardinner')
       var cardTopObj = document.getElementsByClassName('card-top')
       cardInnerObj[0].style.transition = 'all .8s'
@@ -168,7 +173,7 @@ export default {
       }, 1000);
       setTimeout(() => {
         this.$router.push({
-          path: '/detail'
+          path: `/detail/${id}` // 将点击进入专辑的ID作为路由传递给detail页面
         })
       }, 1800);
       return {}
@@ -229,9 +234,8 @@ html::-webkit-scrollbar {
   overflow: hidden;
   // color: #000;
   .album-img {
-    filter: blur(1px);
     width: @card_top_size;
-    height: @card_top_size - 80px;
+    height: @card_top_size;
   }
   .album-ar {
     font-size: 20px;
@@ -240,7 +244,7 @@ html::-webkit-scrollbar {
     text-shadow: 0 0 6px #000000;
     position: relative;
     left: 15px;
-    bottom: 60px;
+    bottom: 145px;
   }
 }
 

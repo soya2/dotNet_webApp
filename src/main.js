@@ -14,7 +14,7 @@ Vue.use(Router)
 
 const routes = [
   { path: '/', component: index },
-  { path: '/detail', component: detail }
+  { path: '/detail/:id', component: detail }
 ]
 
 const router = new Router({
